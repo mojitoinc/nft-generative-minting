@@ -12,14 +12,15 @@ As of v2.0.0, nft-generator-py will use the argparse library in order to support
 1. Install requirements: `python3 -m pip install -r requirements.txt`
 2. Make a configuration JSON file. See the configuration section below for specifications.
 3. Add layer files into the `/images` folder.
-4. Run the command `python3 generate.py --amount AMOUNT --config CONFIG`
+4. Run the command `python3 generate.py --amount AMOUNT --config CONFIG --approach APPROACH_TYPE_NUMBER`
    
    where:
    1. `AMOUNT` is the amount of images to generate
    2. `CONFIG` is the path pointing to a `.json` file containing valid program configuration.
+   3. `APPROACH_TYPE_NUMBER` is the approach number which you need to execute the generative approaches of the layers and background
 
 ## How it works
-- A call to `generate_unique_images(amount, config)` is made, which is the meat of the application where all the processing happens.
+- A call to `generate_unique_images(amount, config, approach_type)` is made, which is the meat of the application where all the processing happens.
 - The `config` object is read and for each object in the `layers` list, random values are selected and checked for uniqueness against all previously generated metadata files.
 - Once we have `amount` unique tokens created, we layer them against eachother and output them and their metadata to their respective folders, `./metadata` and `./images`.
 
