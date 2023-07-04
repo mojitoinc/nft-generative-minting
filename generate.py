@@ -13,7 +13,6 @@ def create_new_image(all_images, config):
     new_image = {}
     for layer in config["layers"]:
       new_image[layer["name"]] = random.choices(layer["values"], layer["weights"])[0]
-    
     # check for incompatibilities
     for incomp in config["incompatibilities"]:
       for attr in new_image:
@@ -24,14 +23,13 @@ def create_new_image(all_images, config):
             new_image[attr] = incomp["default"]["value"]
           else:
             return create_new_image(all_images, config)
-    print("New Image",new_image)
-    print("All Image",all_images)
-    # if new_image in all_images:
-    #   return create_new_image(all_images, config)
-    # else:
-    return new_image
 
-def generate_unique_images(amount, config, approach_type):
+    if new_image in all_images:
+      return create_new_image(all_images, config)
+    else: 
+      return new_image
+
+def generate_unique_images(amount, config):
   print("Generating {} unique NFTs...".format(amount))
   pad_amount = len(str(amount))
   trait_files = {}
@@ -49,16 +47,33 @@ def generate_unique_images(amount, config, approach_type):
         
   # generate n unique images
   all_images = []
-  for i in range(amount): 
+  count = {"Handshake":2,"Phone":20,"Match":1,"Blank":1977}
+  adding_count={"Handshake":0,"Phone":0,"Match":0,"Blank":0}
+  while len(all_images)!=2000:
     new_trait_image = create_new_image(all_images, config)
-    if approach_type == 1:
-      if new_trait_image not in all_images:
-        all_images.append(new_trait_image)
-    elif approach_type == 2:
+    data = True
+    if new_trait_image['Effect'] == "Handshake":
+      if count["Handshake"]==adding_count["Handshake"]:
+        data =False
+      else:
+        adding_count["Handshake"]+=1
+    elif new_trait_image["Effect"] == "Phone":
+      if count["Phone"]==adding_count["Phone"]:
+        data =False
+      else:
+        adding_count["Phone"]+=1
+    elif new_trait_image["Effect"] == "Blank":
+      if count["Blank"]==adding_count["Blank"]:
+        data =False
+      else:
+        adding_count["Blank"]+=1
+    elif new_trait_image["Effect"] == "Match":
+      if count["Match"]==adding_count["Match"]:
+        data =False
+      else:
+        adding_count["Match"]+=1
+    if data:
       all_images.append(new_trait_image)
-    elif approach_type == 3:
-      if new_trait_image in all_images:
-         return create_new_image(all_images, config)
 
   i = 1
   for item in all_images:
@@ -71,15 +86,11 @@ def generate_unique_images(amount, config, approach_type):
     for key in token:
       if key != "tokenId":
         attributes.append({"trait_type": key, "value": token[key]})
-    for value in config["attributes"]:
-          print("Attributes:", value)
-          attributes.append(value)
     token_metadata = {
         "image": config["baseURI"] + "/images/" + str(token["tokenId"]) + '.png',
         "tokenId": token["tokenId"],
         "name":  config["name"] + str(token["tokenId"]).zfill(pad_amount),
         "description": config["description"],
-        "animation_url":config["animation_url"],
         "attributes": attributes
     }
     with open('./metadata/' + str(token["tokenId"]) + '.json', 'w') as outfile:
@@ -88,6 +99,15 @@ def generate_unique_images(amount, config, approach_type):
   with open('./metadata/all-objects.json', 'w') as outfile:
     json.dump(all_images, outfile, indent=4)
   
+    
+  all_token_rarity = []
+  for layer in config["layers"]:
+    all_token_rarity.append({ layer["name"]: Counter(image[layer["name"]] for image in all_images) })
+
+  with open('./metadata/all-rarity.json', 'w') as outfile:
+    json.dump(all_token_rarity, outfile, indent=4)
+
+
   for item in all_images:
     layers = []
     for index, attr in enumerate(item):
@@ -118,29 +138,6 @@ def generate_unique_images(amount, config, approach_type):
       file_name = str(item["tokenId"]) + ".png"
       rgb_im.save("./images/" + file_name)
   
-  all_token_rarity = []
-  for layer in config["layers"]:
-    all_token_rarity.append({ layer["name"]: Counter(image[layer["name"]] for image in all_images) })
-
-  with open('./metadata/all-rarity.json', 'w') as outfile:
-    json.dump(all_token_rarity, outfile, indent=4)
-
-  
-  # v1.0.2 addition
-  print("\nUnique NFT's generated. After uploading images to IPFS, please paste the CID below.\nYou may hit ENTER or CTRL+C to quit.")
-  cid = input("IPFS Image CID (): ")
-  if len(cid) > 0:
-    if not cid.startswith("ipfs://"):
-      cid = "ipfs://{}".format(cid)
-    if cid.endswith("/"):
-      cid = cid[:-1]
-    for i, item in enumerate(all_images):
-      with open('./metadata/' + str(item["tokenId"]) + '.json', 'r') as infile:
-        original_json = json.loads(infile.read())
-        original_json["image"] = original_json["image"].replace(config["baseURI"]+"/", cid+"/")
-        with open('./metadata/' + str(item["tokenId"]) + '.json', 'w') as outfile:
-          json.dump(original_json, outfile, indent=4)
-
 
 
 #Additional layer objects can be added following the above formats. They will automatically be composed along with the rest of the layers as long as they are the same size as eachother.
@@ -151,17 +148,15 @@ generator = argparse.ArgumentParser(prog='generate', usage='generate.py [options
 
 generator.add_argument('-n', '--amount', help="Amount to generate")
 generator.add_argument('-c', '--config', help="Path to configuration file")
-generator.add_argument('--sum', metavar='N', type=int, help="Approach type number")
 
 args = generator.parse_args()
 
 if args.amount and args.config:
   if pathExists(args.config):
-    generate_unique_images(int(args.amount), loadJSON(args.config), int(args.approach))
+    generate_unique_images(int(args.amount), loadJSON(args.config))
   else:
     print('generator: error: Configuration file specified doesn\'t exist.\n')
 
 else:
   print('generator: error: Missing a mandatory option (-n or -c). Use -h to show the help menu.\n')
 #generate_unique_images(args.amo, )
-
