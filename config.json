@@ -5,35 +5,35 @@
       "values": ["Black","Blue","Green","Red"],
       "trait_path": "./trait-layers/layer1",
       "filename": ["Cage_Black","Cage_Blue","Cage_Green","Cage_Red"],
-      "weights": [25,25,25,25]
+      "weights": [20,30,30,20]
     },
     {
       "name": "Sticker",
       "values": ["Italian Flag","Marvin Logo","The Italian Dream","Punch"],
       "trait_path": "./trait-layers/layer2",
       "filename": ["Sticker_Flag", "Sticker_Logo", "Sticker_Payoff","Sticker_Punch"],
-      "weights": [25,25,25,25]
+      "weights": [20,20,30,30]
     },
     {
       "name": "Image Cage",
       "values": ["Sparring", "Portrait","Winner","Confidence","Training"],
       "trait_path": "./trait-layers/layer3",
       "filename": ["Images_C_1", "Images_C_2","Images_C_3","Images_C_4","Images_C_5"],
-      "weights": [20,20,20,20,20]
+      "weights": [35,10,10,10,35]
     },
     {
       "name": "Image Frame",
       "values": ["Straight", "Double Straight","Tattoo Arm","Snake","Focused"],
       "trait_path": "./trait-layers/layer4",
       "filename": ["Image_F_1", "Image_F_2","Image_F_3","Image_F_4","Image_F_5"],
-      "weights": [20,20,20,20,20]
+      "weights": [35,10,35,10,10]
     },
     {
       "name": "Frame",
       "values": ["Green", "Gold","Yellow","Wood","Steel","Silver","Red","Pink","Marble","Blue"],
       "trait_path": "./trait-layers/layer5",
       "filename": ["Frame_Green", "Frame_Gold","Frame_Yellow","Frame_Wood","Frame_Steel","Frame_Silver","Frame_Red","Frame_Pink","Frame_Marble","Frame_Blue"],
-      "weights": [10,10,10,10,10,10,10,10,10,10]
+      "weights": [12,5,12,12,12,5,12,12,5,13]
     },
     {
       "name": "Effect",

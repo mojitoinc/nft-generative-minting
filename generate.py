@@ -75,11 +75,12 @@ def generate_unique_images(amount, config):
     if data:
       all_images.append(new_trait_image)
 
+
   i = 1
   for item in all_images:
       item["tokenId"] = i
       i += 1
-
+  jsonData={}
   # dump unique images
   for i, token in enumerate(all_images):
     attributes = []
@@ -93,11 +94,21 @@ def generate_unique_images(amount, config):
         "description": config["description"],
         "attributes": attributes
     }
+    json_data = {
+        "image": config["baseURI"] + "/images/" + str(token["tokenId"]) + '.png',
+        "name":  config["name"] + str(token["tokenId"]).zfill(pad_amount),
+        "description": config["description"],
+        "attributes": attributes
+    }
+    jsonData[str(token["tokenId"]) + '.png']=json_data
     with open('./metadata/' + str(token["tokenId"]) + '.json', 'w') as outfile:
         json.dump(token_metadata, outfile, indent=4)
 
   with open('./metadata/all-objects.json', 'w') as outfile:
     json.dump(all_images, outfile, indent=4)
+  
+  with open('./metadata/final_metadata.json', 'w') as outfile:
+    json.dump(jsonData, outfile, indent=4)
   
     
   all_token_rarity = []
@@ -132,8 +143,8 @@ def generate_unique_images(amount, config):
       main_composite = Image.alpha_composite(layers[0], layers[1])
       layers.pop(0)
       layers.pop(0)
-      for index, remaining in enumerate(layers):
-        main_composite = Image.alpha_composite(main_composite, remaining)
+      for index, remaining in enumerate(layers): 
+          main_composite = Image.alpha_composite(main_composite, remaining)
       rgb_im = main_composite.convert('RGBA')
       file_name = str(item["tokenId"]) + ".png"
       rgb_im.save("./images/" + file_name)
